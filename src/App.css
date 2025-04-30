@@ -36,3 +36,49 @@
     transform: rotate(360deg);
   }
 }
+
+
+
+
+.page-background {
+  background-color: #f8f9fa; /* светлый фон страницы */
+  min-height: 100vh;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+  justify-content: center;
+}
+
+.grid-item {
+  background: #fff;
+  border-radius: 25px;
+  overflow: hidden;
+  transition: box-shadow 0.3s;
+}
+
+.grid-item:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.card-img-top {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.card-body {
+  padding: 15px;
+}
+
+.card-title {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.card-text {
+  font-size: 0.95rem;
+  color: #555;
+}
