@@ -1,16 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../components/Header';
 
 function PostDetailPage() {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [post, setPost] = useState(null);
+    const [likesCount, setLikesCount] = useState(0);
+    const [isLiked, setIsLiked] = useState(false);
+    const [message, setMessage] = useState('');
+    
 
     useEffect(() => {
-      // загрузить пост
+      // Загрузка поста и статуса лайка
       axios.get(`http://localhost:8000/api/posts/${id}/`)
-        .then(res => setPost(res.data))
+        .then(res => {
+          setPost(res.data);
+          setLikesCount(res.data.likes_count);
+          setIsLiked(res.data.is_liked)
+        })
         .catch(console.error);
     
       // Засечь время чтения + вызвать TrackPostView при уходе
@@ -37,6 +46,23 @@ function PostDetailPage() {
       };
     }, [id]);
     
+    const toggleLike = () => {
+      const token = localStorage.getItem('access');
+      if (!token) {
+      // если не залогинен — показываем сообщение и редирект
+      setMessage('Чтобы поставить лайк нужно войти в аккаунт');
+    }
+      
+      axios.post(`http://localhost:8000/api/posts/${id}/like/`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then(res => {
+        setLikesCount(res.data.likes_count);
+        setIsLiked(res.data.status === 'liked');
+        setMessage('');  // сбросим сообщение, если было
+      })
+      .catch(console.error);
+    };
 
     if (!post) return <p>загрузка...</p>;
 
@@ -53,7 +79,27 @@ function PostDetailPage() {
               />
             )}
             <p>{post.content}</p>
-            <p className="text-muted">👁 Просмотров: {post.views}</p>
+
+            <div className="d-flex justify-content-between align-items-center">
+              <button
+                className={`btn ${isLiked ? 'btn-danger' : 'btn-outline-danger'}`}
+                onClick={toggleLike}
+              >
+                {isLiked ? '❤️ ' : '❤️ '} {likesCount}
+              </button>
+              <p className="text-muted mb-0">👁 Просмотров: {post.views}</p>
+            </div>
+            {/* Сообщение об ошибке или подсказка */}
+            {message && (
+              <div className="alert alert-warning my-2">
+                {message}&nbsp;
+                {!localStorage.getItem('access') && (
+                  <a href="/login" onClick={e => { e.preventDefault(); navigate('/login'); }}>
+                    Войти в аккаунт
+                  </a>
+                )}
+              </div>
+            )}
           </div>
         </>
       );
