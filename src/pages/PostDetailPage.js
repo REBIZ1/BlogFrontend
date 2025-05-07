@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../components/Header';
+import { Link } from 'react-router-dom';
 
 function PostDetailPage() {
     const { id } = useParams();
@@ -70,16 +71,26 @@ function PostDetailPage() {
         <>
           <Header />
           <div className="container py-5">
-            <h1>{post.title}</h1>
-            {post.cover && (
+          {post.cover && (
               <img
                 src={post.cover}
                 alt="Обложка поста"
                 style={{ width: "100%", maxHeight: "400px", objectFit: "cover", marginBottom: "20px" }}
               />
             )}
+            <h1>{post.title}</h1>
             <p>{post.content}</p>
-
+            <div className="mb-3">
+              {post.tags.map(tag => (
+                <Link
+                  key={tag.slug}
+                  to={`/?tag=${tag.slug}`}
+                  className="badge bg-secondary me-1"
+                >
+                  {tag.name}
+                </Link>
+              ))}
+            </div>
             <div className="d-flex justify-content-between align-items-center">
               <button
                 className={`btn ${isLiked ? 'btn-danger' : 'btn-outline-danger'}`}
