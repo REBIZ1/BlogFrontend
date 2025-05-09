@@ -59,7 +59,7 @@ function HomePage() {
         <div className="row g-4">
           {posts.length > 0 ? (
             posts.map(post => (
-              <div key={post.id} className="col-md-6">
+              <div key={post.id} className="col-md-4">
                 <div className="card h-100 shadow-sm">
                   <Link to={`/post/${post.id}`} className="text-decoration-none text-dark">
                     {post.cover && (

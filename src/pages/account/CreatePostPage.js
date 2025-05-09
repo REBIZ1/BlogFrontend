@@ -1,7 +1,9 @@
+// src/pages/account/CreatePostPage.js
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useTags } from '../../hooks/useTags';
+import RichTextEditor from '../../components/RichTextEditor';
 
 export default function CreatePostPage() {
   const navigate = useNavigate();
@@ -11,17 +13,19 @@ export default function CreatePostPage() {
     title: '',
     content: '',
     cover: null,
-    tagSlugs: []      // здесь будем хранить выбранные slug
+    tagSlugs: []
   });
+  // errors хранит объект полевых ошибок { title: [...], content: [...], tag_slugs: [...], non_field_errors: [...] }
+  const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value, files, selectedOptions } = e.target;
+    setErrors(prev => ({ ...prev, [name]: null, non_field_errors: null }));
+
     if (name === 'cover') {
       setFormData(f => ({ ...f, cover: files[0] }));
     } else if (name === 'tagSlugs') {
-      // собираем массив выбранных slug из <select multiple>
       const slugs = Array.from(selectedOptions).map(opt => opt.value);
       setFormData(f => ({ ...f, tagSlugs: slugs }));
     } else {
@@ -32,60 +36,97 @@ export default function CreatePostPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    setSubmitError(null);
+    setErrors({});
+
+    const refresh = localStorage.getItem('refresh');
+    let access = localStorage.getItem('access');
+    if (!access || !refresh) {
+      return navigate('/login', { replace: true });
+    }
+
+    // обновляем access по refresh
+    try {
+      const resp = await axios.post('http://localhost:8000/api/token/refresh/', { refresh });
+      access = resp.data.access;
+      localStorage.setItem('access', access);
+    } catch {
+      return navigate('/login', { replace: true });
+    }
+
+    // формируем FormData
+    const data = new FormData();
+    data.append('title', formData.title);
+    data.append('content', formData.content);
+    if (formData.cover) data.append('cover', formData.cover);
+    formData.tagSlugs.forEach(slug => data.append('tag_slugs', slug));
 
     try {
-      const token = localStorage.getItem('access');
-      if (!token) throw new Error('Не авторизован');
-
-      const data = new FormData();
-      data.append('title', formData.title);
-      data.append('content', formData.content);
-      if (formData.cover) data.append('cover', formData.cover);
-      // важное: указываем именно field name 'tag_slugs'
-      formData.tagSlugs.forEach(slug => data.append('tag_slugs', slug));
-
-      await axios.post('http://localhost:8000/api/posts/', data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-      navigate('/account/create');  // или куда нужно после создания
+      await axios.post(
+        'http://localhost:8000/api/posts/',
+        data,
+        { headers: { Authorization: `Bearer ${access}` } }
+      );
+      navigate('/account/create');  // или на detail созданного поста
     } catch (err) {
-      console.error('Ошибка создания поста:', err);
-      setSubmitError(err);
+      const resp = err.response?.data;
+      if (resp) {
+        // преобразуем tag_slugs в совпадающий ключ
+        const fieldErrors = {};
+        for (const key of Object.keys(resp)) {
+          // если бэкенд отдал tag_slugs, поправим на tagSlugs
+          const field = key === 'tag_slugs' ? 'tagSlugs' : key;
+          fieldErrors[field] = resp[key];
+        }
+        setErrors(fieldErrors);
+      } else {
+        setErrors({ non_field_errors: ['Ошибка сервера. Попробуйте позже.'] });
+      }
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div>
-      <h3>Создать новый пост</h3>
+    <div className="container py-4" style={{ maxWidth: '800px' }}>
+      <h3 className="mb-4">Создать новую статью</h3>
+
+      {errors.non_field_errors && (
+        <div className="alert alert-danger">
+          {errors.non_field_errors.map((msg, i) => <div key={i}>{msg}</div>)}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} encType="multipart/form-data">
+        {/* Заголовок */}
         <div className="mb-3">
           <label className="form-label">Заголовок</label>
           <input
             name="title"
-            className="form-control"
+            className={`form-control ${errors.title ? 'is-invalid' : ''}`}
             value={formData.title}
             onChange={handleChange}
             required
           />
+          {errors.title && errors.title.map((msg, i) => (
+            <div key={i} className="invalid-feedback">{msg}</div>
+          ))}
         </div>
 
+        {/* Обложка */}
         <div className="mb-3">
           <label className="form-label">Обложка</label>
           <input
             type="file"
             name="cover"
-            className="form-control"
+            className={`form-control ${errors.cover ? 'is-invalid' : ''}`}
             onChange={handleChange}
           />
+          {errors.cover && errors.cover.map((msg, i) => (
+            <div key={i} className="invalid-feedback">{msg}</div>
+          ))}
         </div>
 
+        {/* Теги */}
         <div className="mb-3">
           <label className="form-label">Теги</label>
           {tagsLoading && <p>Загрузка тегов…</p>}
@@ -93,38 +134,35 @@ export default function CreatePostPage() {
           <select
             multiple
             name="tagSlugs"
-            className="form-select"
+            className={`form-select ${errors.tagSlugs ? 'is-invalid' : ''}`}
             value={formData.tagSlugs}
             onChange={handleChange}
           >
             {tags.map(tag => (
-              <option key={tag.id} value={tag.slug}>
-                {tag.name}
-              </option>
+              <option key={tag.id} value={tag.slug}>{tag.name}</option>
             ))}
           </select>
-          <div className="form-text">
-            Чтобы выбрать несколько, удерживайте Ctrl (Cmd на Mac).
-          </div>
+          {errors.tagSlugs && errors.tagSlugs.map((msg, i) => (
+            <div key={i} className="invalid-feedback">{msg}</div>
+          ))}
+          <div className="form-text">Чтобы выбрать несколько, удерживайте Ctrl (Cmd на Mac).</div>
         </div>
 
+        {/* Контент */}
         <div className="mb-3">
-          <label className="form-label">Содержимое</label>
-          <textarea
-            name="content"
-            className="form-control"
-            rows={6}
+          <label className="form-label">Содержимое статьи</label>
+          <RichTextEditor
             value={formData.content}
-            onChange={handleChange}
-            required
+            onChange={value => {
+              setFormData(f => ({ ...f, content: value }));
+              setErrors(prev => ({ ...prev, content: null }));
+            }}
+            className={errors.content ? 'is-invalid' : ''}
           />
+          {errors.content && errors.content.map((msg, i) => (
+            <div key={i} className="text-danger mt-1">{msg}</div>
+          ))}
         </div>
-
-        {submitError && (
-          <div className="alert alert-danger">
-            Ошибка при отправке: {submitError.message}
-          </div>
-        )}
 
         <button
           type="submit"

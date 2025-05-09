@@ -39,7 +39,7 @@ function LoginPage() {
             const userData = userResponse.data;
             localStorage.setItem('username', userData.username);
             if (userData.avatar) {
-              localStorage.setItem('avatar', `http://localhost:8000${userData.avatar}`);
+              localStorage.setItem('avatar', userData.avatar);
             } else {
               localStorage.removeItem('avatar');
             }        

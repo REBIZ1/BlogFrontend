@@ -9,6 +9,7 @@ import CreatePostPage from './pages/account/CreatePostPage'
 import FavoritesPage   from './pages/account/FavoritesPage'
 import HistoryPage     from './pages/account/HistoryPage'
 import SettingsPage    from './pages/account/SettingsPage'
+import 'react-quill/dist/quill.snow.css';
 
 function App() {
   return (

@@ -82,3 +82,25 @@
   font-size: 0.95rem;
   color: #555;
 }
+
+/* базовые стили для форматированного контента */
+.rich-content h1, .rich-content h2, .rich-content h3 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+.rich-content p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+.rich-content ul {
+  list-style: disc inside;
+  margin-bottom: 1rem;
+}
+.rich-content ol {
+  list-style: decimal inside;
+  margin-bottom: 1rem;
+}
+.rich-content a {
+  color: #007bff;
+  text-decoration: underline;
+}
