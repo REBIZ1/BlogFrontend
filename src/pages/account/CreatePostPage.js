@@ -1,5 +1,5 @@
 // src/pages/account/CreatePostPage.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useTags } from '../../hooks/useTags';
@@ -7,6 +7,27 @@ import RichTextEditor from '../../components/RichTextEditor';
 
 export default function CreatePostPage() {
   const navigate = useNavigate();
+
+  // как только зашли на страницу — проверяем токены
+  useEffect(() => {
+    const refresh = localStorage.getItem('refresh');
+    const access  = localStorage.getItem('access');
+    // если вообще нет refresh — сразу на логин
+    if (!refresh) {
+      navigate('/login', {replace: true});
+      return;
+    }
+    // если есть refresh, пытаемся обновить access
+    axios.post('http://localhost:8000/api/token/refresh/', { refresh })
+    .then(res => {
+      localStorage.setItem('access', res.data.access);
+    })
+    .catch(() =>{
+      // не удалось обновить — уходим на логин
+      navigate('/login', { replace: true });
+    });
+  }, [navigate]);
+
   const { tags, loading: tagsLoading, error: tagsError } = useTags();
 
   const [formData, setFormData] = useState({

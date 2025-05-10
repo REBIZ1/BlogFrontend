@@ -1,4 +1,4 @@
-import React from 'react';
+import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import PostDetailPage from './pages/PostDetailPage';
@@ -10,6 +10,7 @@ import FavoritesPage   from './pages/account/FavoritesPage'
 import HistoryPage     from './pages/account/HistoryPage'
 import SettingsPage    from './pages/account/SettingsPage'
 import 'react-quill/dist/quill.snow.css';
+
 
 function App() {
   return (
