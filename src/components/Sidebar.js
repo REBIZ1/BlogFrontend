@@ -2,19 +2,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { Range } from 'react-range';
 
 export default function Sidebar() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  // пункты меню
   const navItems = [
     { to: '/',                   label: 'Главная',      icon: '🏠' },
     { to: '/subscriptions',      label: 'Подписки',     icon: '🔔' },
     { to: '/popular',            label: 'Популярное',   icon: '🔥' },
     { to: '/recommendations',    label: 'Рекомендации', icon: '⭐' },
     { to: '/new',                label: 'Новые',        icon: '🆕' },
-    { to: '/account/favorites',  label: 'Избранное',    icon: '❤️' },
+    { to: '/favorites',          label: 'Избранное',    icon: '❤️' },
   ];
 
   // состояние фильтра по тегам
@@ -22,19 +22,17 @@ export default function Sidebar() {
   const [searchTerm, setSearchTerm]     = useState('');
   const [filteredTags, setFilteredTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
+  const [likesOrder, setLikesOrder]     = useState(null); // 'asc' | 'desc' | null
+  const [viewsOrder, setViewsOrder]     = useState(null); // 'asc' | 'desc' | null
+  const [showFilters, setShowFilters]   = useState(false);
   const wrapperRef = useRef(null);
 
-  // показывать панель фильтров?
-  const [showFilters, setShowFilters] = useState(false);
-
-  // загрузить теги
   useEffect(() => {
     axios.get('http://localhost:8000/api/tags/')
       .then(res => setAllTags(res.data))
       .catch(console.error);
   }, []);
 
-  // обновлять подсказки
   useEffect(() => {
     if (!searchTerm.trim()) {
       setFilteredTags([]);
@@ -50,7 +48,6 @@ export default function Sidebar() {
     }
   }, [searchTerm, allTags, selectedTags]);
 
-  // закрыть подсказки при клике вне
   useEffect(() => {
     function onClickOutside(e) {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
@@ -61,24 +58,74 @@ export default function Sidebar() {
     return () => document.removeEventListener('mousedown', onClickOutside);
   }, []);
 
-  // выбрать тег
   const pickTag = tag => {
-    setSelectedTags([...selectedTags, tag]);
+    setSelectedTags(prev => [...prev, tag]);
     setSearchTerm('');
   };
-  // удалить
+
   const removeTag = slug => {
-    setSelectedTags(selectedTags.filter(t => t.slug !== slug));
+    setSelectedTags(prev => prev.filter(t => t.slug !== slug));
   };
 
-  // применить фильтры — переход на главную с параметром tag
-  const applyFilters = () => {
-    if (selectedTags.length > 0) {
-      const param = selectedTags.map(t => t.slug).join(',');
-      navigate(`/?tag=${param}`);
-    } else {
-      navigate('/');
+  // Тоггл сортировки по лайкам: при включении сбрасываем просмотры
+  const toggleLikesOrder = () => {
+    setLikesOrder(prev => {
+      const next = prev === 'desc' ? 'asc' : 'desc';
+      if (next) setViewsOrder(null);
+      return next;
+    });
+  };
+  // Тоггл сортировки по просмотрам: при включении сбрасываем лайки
+  const toggleViewsOrder = () => {
+    setViewsOrder(prev => {
+      const next = prev === 'desc' ? 'asc' : 'desc';
+      if (next) setLikesOrder(null);
+      return next;
+    });
+  };
+
+  // --- слайдер дат + ручной ввод ---
+  const ONE_DAY      = 24 * 60 * 60 * 1000;
+  const minTs        = new Date('2023-01-01').getTime();
+  const maxTs        = Date.now();
+  const [dateRange, setDateRange] = useState([minTs, maxTs]);
+
+  // Парам dateFrom/dateTo в формате YYYY-MM-DD
+  const dateFrom = new Date(dateRange[0]).toISOString().slice(0,10);
+  const dateTo   = new Date(dateRange[1]).toISOString().slice(0,10);
+
+  // Когда вручную меняют поля, конвертим в timestamp и обновляем слайдер
+  const onDateFromChange = e => {
+    const ts = new Date(e.target.value).getTime();
+    if (!isNaN(ts) && ts <= dateRange[1]) {
+      setDateRange([ts, dateRange[1]]);
     }
+  };
+  const onDateToChange = e => {
+    const ts = new Date(e.target.value).getTime();
+    if (!isNaN(ts) && ts >= dateRange[0]) {
+      setDateRange([dateRange[0], ts]);
+    }
+  };
+
+  const applyFilters = () => {
+    const params = new URLSearchParams();
+    selectedTags.forEach(t => params.append('tag', t.slug));
+    if (likesOrder)  params.set('likes_order', likesOrder);
+    if (viewsOrder)  params.set('views_order', viewsOrder);
+    params.set('date_from', dateFrom);
+    params.set('date_to',   dateTo);
+    const qs = params.toString();
+    navigate(qs ? `/?${qs}` : `/`);
+    setShowFilters(false);
+  };
+
+  const clearFilters = () => {
+    setSelectedTags([]);
+    setLikesOrder(null);
+    setViewsOrder(null);
+    setDateRange([minTs, maxTs]);
+    navigate('/');
     setShowFilters(false);
   };
 
@@ -86,11 +133,10 @@ export default function Sidebar() {
     <div
       className='bg-white border-end'
       style={{
-        width: '240px',       // зафиксированная ширина
-        maxWidth: '240px',    // больше не растянется
-        flex: '0 0 240px',    // внутри d-flex‑контейнера не будет расти или сжиматься
-        height: 'calc(100vh - 68px)',  // при желании жёстко задать высоту
-        overflowY: 'auto'     // чтобы, если контента много, появился скролл
+        width: '240px',
+        flex: '0 0 240px',
+        height: 'calc(100vh - 68px)',
+        overflowY: 'auto'
       }}
     >
       <ul className="list-unstyled m-0 p-0">
@@ -113,77 +159,145 @@ export default function Sidebar() {
         })}
       </ul>
 
-      {/* Кнопка показа/скрытия фильтров */}
-      <div className="p-3">
-        <button
-          className="btn btn-outline-secondary w-100 mb-2"
-          onClick={() => setShowFilters(f => !f)}
-        >
-          Поиск по фильтрам
-        </button>
+      {pathname === '/' && (
+        <div className="p-3">
+          <button
+            className="btn btn-outline-secondary w-100 mb-2"
+            onClick={() => setShowFilters(f => !f)}
+          >
+            Поиск по фильтрам
+          </button>
 
-        {showFilters && (
-          <div ref={wrapperRef}>
-            <label htmlFor="tag-search" className="form-label">
-              Фильтр по тегам
-            </label>
-            <input
-              id="tag-search"
-              type="text"
-              className="form-control mb-1"
-              placeholder="Начните вводить…"
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-            />
-
-            {/* подсказки */}
-            {filteredTags.length > 0 && (
-              <ul
-                className="list-group position-absolute"
-                style={{ zIndex: 1000, width: 200, marginTop: 0 }}
+          {showFilters && (
+            <div ref={wrapperRef}>
+              {/* Сортировка по лайкам */}
+              <button
+                type="button"
+                className="btn btn-outline-secondary w-100 mb-2"
+                onClick={toggleLikesOrder}
               >
-                {filteredTags.map(tag => (
-                  <li
-                    key={tag.slug}
-                    className="list-group-item list-group-item-action"
-                    onClick={() => pickTag(tag)}
-                  >
-                    {tag.name}
-                  </li>
-                ))}
-              </ul>
-            )}
+                По лайкам {likesOrder === 'asc' ? '↑' : likesOrder === 'desc' ? '↓' : ''}
+              </button>
 
-            {/* выбранные */}
-            {selectedTags.length > 0 && (
+              {/* Сортировка по просмотрам */}
+              <button
+                type="button"
+                className="btn btn-outline-secondary w-100 mb-2"
+                onClick={toggleViewsOrder}
+              >
+                По просмотрам {viewsOrder === 'asc' ? '↑' : viewsOrder === 'desc' ? '↓' : ''}
+              </button>
+
+              {/* Слайдер */}
               <div className="mt-2">
-                {selectedTags.map(tag => (
-                  <span
-                    key={tag.slug}
-                    className="badge bg-primary me-1 mb-1"
-                  >
-                    {tag.name}
-                    <button
-                      type="button"
-                      className="btn-close btn-close-white btn-sm ms-1"
-                      aria-label="Close"
-                      onClick={() => removeTag(tag.slug)}
-                    />
-                  </span>
-                ))}
-              </div>
-            )}
+                <label className="form-label mb-0">Диапазон дат</label>
+                <Range
+                  step={ONE_DAY}
+                  min={minTs}
+                  max={maxTs}
+                  values={dateRange}
+                  onChange={setDateRange}
+                  renderTrack={({ props, children }) => (
+                    <div
+                      {...props}
+                      style={{
+                        position: 'relative',
+                        width: '100%',
+                        height: 6,
+                        background: '#ddd',
+                        margin: '15px 0'
+                      }}
+                    >
+                      {children}
+                    </div>
+                  )}
+                  renderThumb={({ props, index }) => (
+                    <div {...props} style={{
+                      ...props.style,
+                      height:16, width:16,
+                      backgroundColor:'#007bff', borderRadius:8
+                    }}/>
+                  )}
+                />
+                {/* Поля ввода */}
+                <div className="d-flex justify-content-between">
+                  <input 
+                    type="date" 
+                    value={dateFrom} 
+                    onChange={onDateFromChange} 
+                    style={{ flex: '1 1 40%', maxWidth: '100px', boxSizing: 'border-box' }}
+                  />
 
-            {/* Кнопка применения фильтра */}
-            <button
-              className="btn btn-primary w-100 mt-3"
-              onClick={applyFilters}
-            >
-              Поиск
-            </button>
-          </div>
-        )}
-      </div>
+                  <input
+                    type="date"
+                    value={dateTo}
+                    onChange={onDateToChange}
+                    style={{ flex: '1 1 40%', maxWidth: '100px', boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+              
+              {/* Фильтр по тегам */}
+              <label htmlFor="tag-search" className="form-label mt-2 mb-1">Теги</label>
+              <input
+                id="tag-search"
+                type="text"
+                className="form-control mb-1"
+                placeholder="Начните вводить…"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+              />
+              {filteredTags.length > 0 && (
+                <ul
+                  className="list-group position-absolute"
+                  style={{ zIndex: 1000, width: 200, marginTop: 0 }}
+                >
+                  {filteredTags.map(tag => (
+                    <li
+                      key={tag.slug}
+                      className="list-group-item list-group-item-action"
+                      onClick={() => pickTag(tag)}
+                    >
+                      {tag.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {selectedTags.length > 0 && (
+                <div className="mt-2">
+                  {selectedTags.map(tag => (
+                    <span key={tag.slug} className="badge bg-primary me-1 mb-1">
+                      {tag.name}
+                      <button
+                        type="button"
+                        className="btn-close btn-close-white btn-sm ms-1"
+                        aria-label="Close"
+                        onClick={() => removeTag(tag.slug)}
+                      />
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Очистить фильтры */}
+              <button
+                className="btn btn-secondary w-100 mt-2"
+                onClick={clearFilters}
+              >
+                Очистить фильтры
+              </button>
+
+              {/* Применить */}
+              <button
+                className="btn btn-primary w-100 mt-2"
+                onClick={applyFilters}
+              >
+                Применить
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

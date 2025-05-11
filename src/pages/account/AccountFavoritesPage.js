@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 
-export default function FavoritesPage() {
+export default function AccountFavoritesPage() {
     const navigate = useNavigate();
     const [likes, setlikes] = useState([]);
     const [loading, setLoading] = useState(true);
