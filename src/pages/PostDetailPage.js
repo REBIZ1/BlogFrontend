@@ -81,7 +81,15 @@ export default function PostDetailPage() {
 
         {/* Основной контент: центрируем и ограничиваем ширину */}
         <main className="flex-grow-1 p-4">
-          <div className="mx-auto" style={{ maxWidth: 800 }}>
+          <div
+            style={{
+              position: 'absolute',
+              left: '50vw',
+              transform: 'translateX(-50%)',
+              width: '100%',
+              maxWidth: 800
+            }}
+          >
             {/* Обложка: object-position top */}
             {post.cover && (
               <div style={{ overflow: 'hidden', borderRadius: 8, marginBottom: 20 }}>
@@ -126,7 +134,10 @@ export default function PostDetailPage() {
             <h1 className="mb-4">{post.title}</h1>
 
             {/* Содержимое */}
-            <div className="mb-5" dangerouslySetInnerHTML={{ __html: post.content }} />
+            <div
+             className="article-content mb-5"
+             dangerouslySetInnerHTML={{ __html: post.content }}
+           />
 
             {/* Теги */}
             <div className="mb-4">

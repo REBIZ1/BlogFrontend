@@ -227,3 +227,51 @@
   font-size: 0.875rem;
   margin-top: 0.25rem;
 }
+
+.article-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;   /* чтобы не было лишних отступов снизу */
+  margin: 1rem auto;/* по желанию: центрируем изображение и даём вертикальный отступ */
+}
+
+.article-content blockquote,
+.article-content p.ql-blockquote {
+  padding: 1em 1.5em;
+  background-color: #f7f7f7;
+  color: #333;
+  font-style: italic;
+  border-radius: 4px;
+  margin: 2em 0;
+  border: none;
+  border-left: 4px solid #006aff;
+  position: relative;
+}
+
+/* Сброс отступов у вложенных <p> внутри */
+.article-content blockquote p,
+.article-content p.ql-blockquote p {
+  margin: 0;
+}
+
+/* Кавычки-«ёлочки» */
+.article-content blockquote::before,
+.article-content p.ql-blockquote::before {
+  content: "“";
+  font-size: 2rem;
+  line-height: 1;
+  position: absolute;
+  top: 0.2em;
+  left: 0.5em;
+  color: #006aff;
+}
+.article-content blockquote::after,
+.article-content p.ql-blockquote::after {
+  content: "”";
+  font-size: 2rem;
+  line-height: 1;
+  position: absolute;
+  bottom: 0.2em;
+  right: 0.5em;
+  color: #006aff;
+}
