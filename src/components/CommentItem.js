@@ -44,7 +44,7 @@ export default function CommentItem({ comment, depth, onNewComment }) {
     <>
       <div
         className="comment-item"
-        style={{ marginLeft: depth * INDENT }}
+        style={{ marginLeft: depth > 0 ? INDENT : 0 }}
       >
         {depth > 0 && <div className="comment-replies-line" />}
 
@@ -103,14 +103,13 @@ export default function CommentItem({ comment, depth, onNewComment }) {
           </div>
         )}
       </div>
-
       {expanded && count > 0 && (
         <div className="comment-replies">
           {replies.map(r => (
             <CommentItem
               key={r.id}
               comment={r}
-              depth={depth + 1}
+              depth={1}                 // <-- всегда 1, не depth+1
               onNewComment={onNewComment}
             />
           ))}
