@@ -1,19 +1,21 @@
+// src/pages/PostDetailPage.js
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../components/Header';
+import Sidebar from '../components/Sidebar';
+import CommentsList from '../components/CommentsList';
 
-function PostDetailPage() {
+export default function PostDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [post, setPost]           = useState(null);
+  const [post, setPost]             = useState(null);
   const [likesCount, setLikesCount] = useState(0);
   const [isLiked, setIsLiked]       = useState(false);
   const [message, setMessage]       = useState('');
 
   useEffect(() => {
-    // 1) Загрузить пост и лайк‑статус
     axios.get(`http://localhost:8000/api/posts/${id}/`)
       .then(res => {
         setPost(res.data);
@@ -22,12 +24,10 @@ function PostDetailPage() {
       })
       .catch(console.error);
 
-    // 2) Засечь время чтения и отправить при уходе
     const start = Date.now();
     const handleUnload = () => {
       const seconds = Math.round((Date.now() - start) / 1000);
-      if (seconds < 8) return;  // прежний порог в 8 секунд
-
+      if (seconds < 8) return;
       const token = localStorage.getItem('access');
       fetch('http://localhost:8000/api/track/', {
         method: 'POST',
@@ -41,7 +41,7 @@ function PostDetailPage() {
 
     window.addEventListener('beforeunload', handleUnload);
     return () => {
-      handleUnload();  // сработает и при переходе внутри SPA
+      handleUnload();
       window.removeEventListener('beforeunload', handleUnload);
     };
   }, [id]);
@@ -74,70 +74,105 @@ function PostDetailPage() {
   return (
     <>
       <Header />
-      <div className="container py-5">
 
-        {post.cover && (
-          <img
-            src={post.cover}
-            alt="Обложка поста"
-            style={{
-              width: "100%",
-              maxHeight: "400px",
-              objectFit: "cover",
-              marginBottom: "20px"
-            }}
-          />
-        )}
+      <div className="d-flex">
+        {/* Сайдбар */}
+        <Sidebar />
 
-        <h1>{post.title}</h1>
-
-        {/* рендерим HTML-контент, полученный из Quill */}
-        <div dangerouslySetInnerHTML={{ __html: post.content }} />
-
-        {/* теги */}
-        <div className="mb-3">
-          {post.tags.map(tag => (
-            <Link
-              key={tag.slug}
-              to={`/?tag=${tag.slug}`}
-              className="badge bg-secondary me-1"
-            >
-              #{tag.name}
-            </Link>
-          ))}
-        </div>
-
-        {/* лайк + просмотры */}
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <button
-            className={`btn ${isLiked ? 'btn-danger' : 'btn-outline-danger'}`}
-            onClick={toggleLike}
-          >
-            {isLiked ? '💔 Убрать лайк' : '❤️ Лайкнуть'} {likesCount}
-          </button>
-          <p className="text-muted mb-0">👁 Просмотров: {post.views}</p>
-        </div>
-
-        {/* подсказка для гостя */}
-        {message && (
-          <div className="alert alert-warning my-2">
-            {message}&nbsp;
-            {!localStorage.getItem('access') && (
-              <a
-                href="/login"
-                onClick={e => {
-                  e.preventDefault();
-                  navigate('/login');
-                }}
-              >
-                Войти в аккаунт
-              </a>
+        {/* Основной контент: центрируем и ограничиваем ширину */}
+        <main className="flex-grow-1 p-4">
+          <div className="mx-auto" style={{ maxWidth: 800 }}>
+            {/* Обложка: object-position top */}
+            {post.cover && (
+              <div style={{ overflow: 'hidden', borderRadius: 8, marginBottom: 20 }}>
+                <img
+                  src={post.cover}
+                  alt="Обложка поста"
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    objectFit: "contain",  // или можно вовсе убрать objectFit
+                    marginBottom: "20px"
+                  }}
+                />
+              </div>
             )}
+
+            {/* Автор и подписка */}
+            <div className="d-flex align-items-center mb-4">
+              {post.author_avatar && (
+                <img
+                  src={post.author_avatar}
+                  alt={post.author_username}
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: '50%',
+                    objectFit: 'cover',
+                    marginRight: 12
+                  }}
+                />
+              )}
+              <strong>{post.author_username}</strong>
+              <button
+                className="btn btn-sm btn-primary ms-auto"
+                onClick={() => alert(`Подписаны на ${post.author_username}`)}
+              >
+                Подписаться
+              </button>
+            </div>
+
+            {/* Заголовок */}
+            <h1 className="mb-4">{post.title}</h1>
+
+            {/* Содержимое */}
+            <div className="mb-5" dangerouslySetInnerHTML={{ __html: post.content }} />
+
+            {/* Теги */}
+            <div className="mb-4">
+              {post.tags.map(tag => (
+                <Link
+                  key={tag.slug}
+                  to={`/?tag=${tag.slug}`}
+                  className="badge bg-secondary me-1"
+                >
+                  #{tag.name}
+                </Link>
+              ))}
+            </div>
+
+            {/* Лайк + просмотры */}
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <button
+                className={`btn ${isLiked ? 'btn-danger' : 'btn-outline-danger'}`}
+                onClick={toggleLike}
+              >
+                {isLiked ? '💔 Убрать лайк' : '❤️ Лайкнуть'} {likesCount}
+              </button>
+              <p className="text-muted mb-0">👁 Просмотров: {post.views}</p>
+            </div>
+            
+            {/* Подсказка */}
+            {message && (
+              <div className="alert alert-warning my-2">
+                {message}&nbsp;
+                {!localStorage.getItem('access') && (
+                  <a
+                    href="/login"
+                    onClick={e => {
+                      e.preventDefault();
+                      navigate('/login');
+                    }}
+                  >
+                    Войти в аккаунт
+                  </a>
+                )}
+              </div>
+            )}
+            <CommentsList postId={post.id} />
           </div>
-        )}
+        </main>
       </div>
     </>
   );
 }
-
-export default PostDetailPage;

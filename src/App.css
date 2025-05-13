@@ -106,3 +106,124 @@
   color: #007bff;
   text-decoration: underline;
 }
+
+/* Скругление и общие переходы */
+.post-card {
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.post-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+/* Обложка: плавное увеличение */
+.post-card__cover-wrapper {
+  overflow: hidden;
+  height: 180px; /* если фиксированная высота */
+}
+.post-card__cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+.post-card:hover .post-card__cover {
+  transform: scale(1.05);
+}
+
+/* Аватарка */
+.post-card__avatar {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  margin-right: 8px;
+}
+
+/* Кнопка «Подписаться»: скрыта по умолчанию */
+.post-card__sub-btn {
+  position: absolute;
+  right: 0;
+  opacity: 0;
+  transform: translateY(-50%);
+  top: 50%;
+  transition: opacity 0.3s ease;
+}
+/* Появляется при ховере всей карточки */
+.post-card:hover .post-card__sub-btn {
+  opacity: 1;
+}
+
+/* Общий контейнер одного комментария */
+.comment-item {
+  position: relative;
+  margin-top: 16px;
+  padding-left: 0; /* отступ создаётся через border */
+}
+
+
+/* Блок шапки: аватар + имя + время */
+.comment-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.comment-header img {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 8px;
+}
+
+/* Текст комментария */
+.comment-content {
+  white-space: pre-wrap;
+  margin-bottom: 8px;
+}
+
+/* Панель кнопок «Ответить» и «Показать ответы» */
+.comment-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+.comment-actions .btn-link {
+  padding: 0;
+  font-size: 0.9rem;
+}
+.comment-actions .btn-link.text-muted {
+  color: #6c757d;
+}
+
+/* Форма ответа */
+.comment-reply-form {
+  margin-top: 8px;
+}
+
+/* Кнопка «Показать все ответы» размещается чуть вправо */
+.comment-show-all {
+  margin-top: 8px;
+  margin-left: 32px; /* 2 уровня вложенности */
+}
+
+.comment-replies {
+  margin-left: 16px;
+  
+  border-left: 2px solid #e0e0e0;
+}
+
+.comment-content,
+.comment-reply-form textarea,
+.comment-form input {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.comment-error {
+  color: #dc3545; /* bootstrap text-danger */
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
