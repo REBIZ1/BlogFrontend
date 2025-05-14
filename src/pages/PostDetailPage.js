@@ -25,15 +25,6 @@ export default function PostDetailPage() {
         setIsLiked(res.data.is_liked);
       })
       .catch(console.error);
-
-    // Проверить статус подписки на автора
-    fetchFollows()
-      .then(follows => {
-        // follows — массив { author_username, … }
-        const isFollowed = follows.some(f => f.author_username === post?.author_username);
-        setSubStatus(isFollowed ? 'followed' : 'unfollowed');
-      })
-      .catch(console.error);
       
     const start = Date.now();
     const handleUnload = () => {
@@ -56,6 +47,17 @@ export default function PostDetailPage() {
       window.removeEventListener('beforeunload', handleUnload);
     };
   }, [id]);
+
+  // 2) Как только post подтянется — проверяем статус подписки
+  useEffect(() => {
+    if (!post) return;  // ждём, пока post не загрузится
+    fetchFollows()
+      .then(follows => {
+        const isFollow = follows.some(f => f.author_username === post.author_username);
+        setSubStatus(isFollow ? 'followed' : 'unfollowed');
+      })
+      .catch(console.error);
+  }, [post]);
 
   const toggleLike = () => {
     const token = localStorage.getItem('access');
@@ -143,7 +145,7 @@ export default function PostDetailPage() {
                   setSubStatus(status);
                 }}
               >
-                {subStatus === 'followed' ? '✓ Подписано' : 'Подписаться'}
+                {subStatus === 'followed' ? 'Подписаны ✓' : 'Подписаться'}
               </button>
             </div>
 

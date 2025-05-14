@@ -66,7 +66,7 @@ export default function PostCard({ post }) {
                 className="btn btn-sm btn-primary post-card__sub-btn"
                 onClick={handleToggle}
               >
-                {subStatus === 'followed' ? '✓ Подписано' : 'Подписаться'}
+                {subStatus === 'followed' ? 'Подписаны ✓' : 'Подписаться'}
               </button>
             </div>
             <h5 className="card-title">{post.title}</h5>
