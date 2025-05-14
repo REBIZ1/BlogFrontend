@@ -12,6 +12,7 @@ import SettingsPage from './pages/account/SettingsPage'
 import PopularPage from './pages/sidebar/PopularPage';
 import NewPage from './pages/sidebar/NewPage';  
 import FavoritesPage from './pages/sidebar/FavoritesPage';
+import AuthorPage  from './pages/AuthorPage';
 import 'react-quill/dist/quill.snow.css';
 
 
@@ -28,6 +29,7 @@ function App() {
         <Route path="/popular" element={<PopularPage />} />
         <Route path='/favorites' element={<FavoritesPage />} />
         <Route path="/new" element={<NewPage />} />
+        <Route path="/author/:username" element={<AuthorPage />} />
 
         {/* Личный кабинет: общий лэйаут и вложенные вкладки */}
         <Route path="/account"     element={<AccountDashboard />}>

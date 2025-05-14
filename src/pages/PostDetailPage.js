@@ -109,19 +109,22 @@ export default function PostDetailPage() {
             {/* Автор и подписка */}
             <div className="d-flex align-items-center mb-4">
               {post.author_avatar && (
-                <img
-                  src={post.author_avatar}
-                  alt={post.author_username}
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: '50%',
-                    objectFit: 'cover',
-                    marginRight: 12
-                  }}
-                />
+                <Link to={`/author/${post.author_username}`}>
+                  <img
+                    src={post.author_avatar}
+                    alt={post.author_username}
+                    style={{
+                      width: 40, height: 40,
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      marginRight: 12
+                    }}
+                  />
+                </Link>
               )}
-              <strong>{post.author_username}</strong>
+              <Link to={`/author/${post.author_username}`} className="text-dark text-decoration-none">
+                <strong>{post.author_username}</strong>
+              </Link>
               <button
                 className="btn btn-sm btn-primary ms-auto"
                 onClick={() => alert(`Подписаны на ${post.author_username}`)}

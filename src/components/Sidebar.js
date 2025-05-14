@@ -7,6 +7,7 @@ import { Range } from 'react-range';
 export default function Sidebar() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const wrapperRef = useRef(null);
 
   const navItems = [
     { to: '/',                   label: 'Главная',      icon: '🏠' },
@@ -17,7 +18,7 @@ export default function Sidebar() {
     { to: '/favorites',          label: 'Избранное',    icon: '❤️' },
   ];
 
-  // состояние фильтра по тегам
+  // состояние фильтра
   const [allTags, setAllTags]           = useState([]);
   const [searchTerm, setSearchTerm]     = useState('');
   const [filteredTags, setFilteredTags] = useState([]);
@@ -25,11 +26,19 @@ export default function Sidebar() {
   const [likesOrder, setLikesOrder]     = useState(null); // 'asc' | 'desc' | null
   const [viewsOrder, setViewsOrder]     = useState(null); // 'asc' | 'desc' | null
   const [showFilters, setShowFilters]   = useState(false);
-  const wrapperRef = useRef(null);
+ 
+  // Авторы
+  const [allAuthors, setAllAuthors]           = useState([]);
+  const [authorSearch, setAuthorSearch]       = useState('');
+  const [filteredAuthors, setFilteredAuthors] = useState([]);
+  const [selectedAuthor, setSelectedAuthor]   = useState(null);
 
   useEffect(() => {
     axios.get('http://localhost:8000/api/tags/')
       .then(res => setAllTags(res.data))
+      .catch(console.error);
+    axios.get('http://localhost:8000/api/users/')
+      .then(res => setAllAuthors(res.data))
       .catch(console.error);
   }, []);
 
@@ -48,10 +57,22 @@ export default function Sidebar() {
     }
   }, [searchTerm, allTags, selectedTags]);
 
+  // Фильтрация подсказок по авторам
+  useEffect(() => {
+    if (!authorSearch.trim()) return setFilteredAuthors([]);
+    const q = authorSearch.toLowerCase();
+    setFilteredAuthors(
+      allAuthors.filter(a => a.username.toLowerCase().startsWith(q))
+    );
+  }, [authorSearch, allAuthors]);
+
+  // Закрыть подсказки при клике вне
   useEffect(() => {
     function onClickOutside(e) {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
         setFilteredTags([]);
+        setFilteredTags([]);
+        setFilteredAuthors([]);
       }
     }
     document.addEventListener('mousedown', onClickOutside);
@@ -66,6 +87,10 @@ export default function Sidebar() {
   const removeTag = slug => {
     setSelectedTags(prev => prev.filter(t => t.slug !== slug));
   };
+
+    // Выбрать автора
+  const pickAuthor   = author => { setSelectedAuthor(author); setAuthorSearch(''); setFilteredAuthors([]); };
+  const removeAuthor = () => setSelectedAuthor(null);
 
   // Тоггл сортировки по лайкам: при включении сбрасываем просмотры
   const toggleLikesOrder = () => {
@@ -113,6 +138,9 @@ export default function Sidebar() {
     selectedTags.forEach(t => params.append('tag', t.slug));
     if (likesOrder)  params.set('likes_order', likesOrder);
     if (viewsOrder)  params.set('views_order', viewsOrder);
+    if (selectedAuthor) {
+      params.set('author', selectedAuthor.username);
+    }
     params.set('date_from', dateFrom);
     params.set('date_to',   dateTo);
     const qs = params.toString();
@@ -122,6 +150,7 @@ export default function Sidebar() {
 
   const clearFilters = () => {
     setSelectedTags([]);
+    setSelectedAuthor(null);
     setLikesOrder(null);
     setViewsOrder(null);
     setDateRange([minTs, maxTs]);
@@ -236,6 +265,33 @@ export default function Sidebar() {
                   />
                 </div>
               </div>
+              
+              {/* Фильтр по авторам */}
+              <label className="form-label">Автор</label>
+              <input
+                type="text"
+                className="form-control mb-1"
+                placeholder="Введите имя…"
+                value={authorSearch}
+                onChange={e=>setAuthorSearch(e.target.value)}
+              />
+              {filteredAuthors.length>0 && (
+                <ul className="list-group position-absolute" style={{ zIndex:1000, width:200 }}>
+                  {filteredAuthors.map(a=>(
+                    <li key={a.username} className="list-group-item list-group-item-action" onClick={()=>pickAuthor(a)}>
+                      {a.username}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {selectedAuthor && (
+                <div className="mb-3">
+                  <span className="badge bg-primary me-1 mb-1">
+                    {selectedAuthor.username}
+                    <button type="button" className="btn-close btn-close-white btn-sm ms-1" onClick={removeAuthor}/>
+                  </span>
+                </div>
+              )}
               
               {/* Фильтр по тегам */}
               <label htmlFor="tag-search" className="form-label mt-2 mb-1">Теги</label>

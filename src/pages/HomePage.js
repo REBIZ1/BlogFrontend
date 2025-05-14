@@ -23,7 +23,7 @@ export default function HomePage() {
       <Header />
 
       <div className="d-flex">
-        {/* Сайдбар с мульти‑фильтром */}
+        {/* Сайдбар с мульти-фильтром */}
         <Sidebar />
 
         {/* Основной контент */}
@@ -35,7 +35,12 @@ export default function HomePage() {
               posts.map(post => (
                 <div key={post.id} className="col-md-6 col-lg-3">
                   <div className="card post-card h-100 shadow-sm d-flex flex-column position-relative">
-                    <Link to={`/post/${post.id}`} className="text-decoration-none text-dark flex-grow-1 d-flex flex-column">
+                    {/* Ссылка на детальную страницу поста */}
+                    <Link
+                      to={`/post/${post.id}`}
+                      className="text-decoration-none text-dark flex-grow-1 d-flex flex-column"
+                    >
+                      {/* Обложка */}
                       {post.cover && (
                         <div className="post-card__cover-wrapper">
                           <img
@@ -45,36 +50,46 @@ export default function HomePage() {
                           />
                         </div>
                       )}
+
                       <div className="card-body d-flex flex-column flex-grow-1">
                         {/* Автор */}
                         <div className="d-flex align-items-center mb-2 position-relative">
                           {post.author_avatar && (
-                            <img
-                              src={post.author_avatar}
-                              alt={post.author_username}
-                              className="rounded-circle post-card__avatar"
-                            />
+                            <Link to={`/author/${post.author_username}`}>
+                              <img
+                                src={post.author_avatar}
+                                alt={post.author_username}
+                                className="rounded-circle post-card__avatar"
+                              />
+                            </Link>
                           )}
-                          <strong className="me-auto">{post.author_username}</strong>
+                          <Link
+                            to={`/author/${post.author_username}`}
+                            className="text-dark text-decoration-none me-auto"
+                          >
+                            <strong>{post.author_username}</strong>
+                          </Link>
                           {/* Кнопка «Подписаться», изначально скрытая */}
                           <button className="btn btn-sm btn-primary post-card__sub-btn">
                             Подписаться
                           </button>
                         </div>
-                      <h5 className="card-title">{post.title}</h5>
-                      <p className="card-text flex-grow-1 text-truncate">
-                        {post.content.replace(/<[^>]+>/g, '').slice(0,100)}…
-                      </p>
-                    </div>
-                  </Link>
+
+                        {/* Заголовок и текст */}
+                        <h5 className="card-title">{post.title}</h5>
+                        <p className="card-text flex-grow-1 text-truncate">
+                          {post.content.replace(/<[^>]+>/g, '').slice(0,100)}…
+                        </p>
+                      </div>
+                    </Link>
 
                     {/* footer */}
-                  <div className="card-footer bg-white border-0 d-flex justify-content-between">
-                    <small className="text-muted">👁 {post.views}</small>
-                    <small className="text-muted">❤️ {post.likes_count}</small>
+                    <div className="card-footer bg-white border-0 d-flex justify-content-between">
+                      <small className="text-muted">👁 {post.views}</small>
+                      <small className="text-muted">❤️ {post.likes_count}</small>
+                    </div>
                   </div>
                 </div>
-              </div>
               ))
             ) : (
               <p>Постов пока нет.</p>
