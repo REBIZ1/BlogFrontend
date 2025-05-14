@@ -5,11 +5,13 @@ import axios from 'axios';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import CommentsList from '../components/CommentsList';
+import { toggleFollow, fetchFollows } from '../api';
 
 export default function PostDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  const [subStatus, setSubStatus] = useState(null);
   const [post, setPost]             = useState(null);
   const [likesCount, setLikesCount] = useState(0);
   const [isLiked, setIsLiked]       = useState(false);
@@ -24,6 +26,15 @@ export default function PostDetailPage() {
       })
       .catch(console.error);
 
+    // Проверить статус подписки на автора
+    fetchFollows()
+      .then(follows => {
+        // follows — массив { author_username, … }
+        const isFollowed = follows.some(f => f.author_username === post?.author_username);
+        setSubStatus(isFollowed ? 'followed' : 'unfollowed');
+      })
+      .catch(console.error);
+      
     const start = Date.now();
     const handleUnload = () => {
       const seconds = Math.round((Date.now() - start) / 1000);
@@ -38,7 +49,7 @@ export default function PostDetailPage() {
         body: JSON.stringify({ post_id: id, seconds })
       });
     };
-
+    
     window.addEventListener('beforeunload', handleUnload);
     return () => {
       handleUnload();
@@ -127,9 +138,12 @@ export default function PostDetailPage() {
               </Link>
               <button
                 className="btn btn-sm btn-primary ms-auto"
-                onClick={() => alert(`Подписаны на ${post.author_username}`)}
+                onClick={async () => {
+                  const status = await toggleFollow(post.author_username);
+                  setSubStatus(status);
+                }}
               >
-                Подписаться
+                {subStatus === 'followed' ? '✓ Подписано' : 'Подписаться'}
               </button>
             </div>
 

@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link }       from 'react-router-dom';
 import axios                     from 'axios';
-import Header                    from '../components/Header';
-import Sidebar                   from '../components/Sidebar';
+import Header                    from '../../components/Header';
+import Sidebar                   from '../../components/Sidebar';
 
 export default function AuthorPage() {
   const { username } = useParams();

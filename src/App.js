@@ -4,7 +4,7 @@ import HomePage from './pages/HomePage';
 import PostDetailPage from './pages/PostDetailPage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
-import AccountDashboard from './pages/AccountDashboard'
+import AccountDashboard from './pages/account/AccountDashboard'
 import CreatePostPage from './pages/account/CreatePostPage'
 import AccountFavoritesPage from './pages/account/AccountFavoritesPage'
 import HistoryPage from './pages/account/HistoryPage'
@@ -12,9 +12,9 @@ import SettingsPage from './pages/account/SettingsPage'
 import PopularPage from './pages/sidebar/PopularPage';
 import NewPage from './pages/sidebar/NewPage';  
 import FavoritesPage from './pages/sidebar/FavoritesPage';
-import AuthorPage  from './pages/AuthorPage';
+import AuthorPage  from './pages/account/AuthorPage';
 import 'react-quill/dist/quill.snow.css';
-
+import SubscriptionsPage from './pages/sidebar/SubscriptionsPage';
 
 function App() {
   return (
@@ -30,6 +30,9 @@ function App() {
         <Route path='/favorites' element={<FavoritesPage />} />
         <Route path="/new" element={<NewPage />} />
         <Route path="/author/:username" element={<AuthorPage />} />
+
+        {/* Подписки */}
+        <Route path="/subscriptions" element={<SubscriptionsPage />} />
 
         {/* Личный кабинет: общий лэйаут и вложенные вкладки */}
         <Route path="/account"     element={<AccountDashboard />}>
