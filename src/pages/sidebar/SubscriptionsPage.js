@@ -1,20 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import Header from '../../components/Header';
 import Sidebar from '../../components/Sidebar';
 import PostCard from '../../components/PostCard';
+import { fetchSubscriptionsPosts } from '../../api';
 
 export default function SubscriptionsPage() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('access');
-    axios.get('http://localhost:8000/api/posts/', {
-      headers: { Authorization: `Bearer ${token}` },
-      params: { subscriptions: true }
-    })
-      .then(res => setPosts(res.data))
+    fetchSubscriptionsPosts()
+      .then(data => setPosts(data))
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
