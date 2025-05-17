@@ -15,6 +15,7 @@ import FavoritesPage from './pages/sidebar/FavoritesPage';
 import AuthorPage  from './pages/account/AuthorPage';
 import 'react-quill/dist/quill.snow.css';
 import SubscriptionsPage from './pages/sidebar/SubscriptionsPage';
+import RecommendationsPage from './pages/sidebar/RecommendationsPage';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path='/favorites' element={<FavoritesPage />} />
         <Route path="/new" element={<NewPage />} />
         <Route path="/author/:username" element={<AuthorPage />} />
+        <Route path="/recommendations" element={<RecommendationsPage />} />
 
         {/* Подписки */}
         <Route path="/subscriptions" element={<SubscriptionsPage />} />

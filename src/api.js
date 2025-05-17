@@ -45,3 +45,13 @@ export async function fetchSubscriptionsPosts() {
   );
   return resp.data; // массив постов
 }
+
+// src/api.js
+export async function fetchContentRecommendations() {
+  const token = localStorage.getItem('access');
+  const resp = await API.get(
+    'recommendations/content/',
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return resp.data; // массив постов
+}
