@@ -55,3 +55,30 @@ export async function fetchContentRecommendations() {
   );
   return resp.data; // массив постов
 }
+
+
+export async function fetchCFRecommendations() {
+  const token = localStorage.getItem('access');
+  try {
+    const resp = await API.get('recommendations/cf/', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return resp.data;
+  } catch (err) {
+    console.error('CF fetch error data:', err.response?.data);
+    throw err;
+  }
+}
+
+
+export async function fetchHybridRecommendations(alpha = 0.6, n = 10) {
+  const token = localStorage.getItem('access');
+  const resp = await API.get(
+    `recommendations/hybrid/`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { alpha, n }
+    }
+  );
+  return resp.data;
+}
