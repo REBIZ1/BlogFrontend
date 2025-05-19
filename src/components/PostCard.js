@@ -1,34 +1,14 @@
 // src/components/PostCard.js
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { toggleFollow, fetchFollows } from '../api';
+import FollowButton from './FollowButton';
 
-export default function PostCard({ post }) {
-  const [subStatus, setSubStatus] = useState(null);
-
-  // при маунте узнаём, подписаны ли мы на автора
-  useEffect(() => {
-    let mounted = true;
-    fetchFollows()
-      .then(follows => {
-        if (!mounted) return;
-        const isFollowed = follows.some(f => f.author_username === post.author_username);
-        setSubStatus(isFollowed ? 'followed' : 'unfollowed');
-      })
-      .catch(console.error);
-    return () => { mounted = false; };
-  }, [post.author_username]);
-
-  const handleToggle = async e => {
-    e.preventDefault();
-    try {
-      const status = await toggleFollow(post.author_username);
-      setSubStatus(status);
-    } catch {
-      alert('Не удалось обновить подписку. Попробуйте позже.');
-    }
-  };
-
+export default function PostCard({
+  post,
+  // эти пропсы прокидываются из родителя, если карточка в контролируемом режиме
+  isFollowed,
+  onToggleFollow
+}) {
   return (
     <div className="col-md-6 col-lg-3">
       <div className="card post-card h-100 shadow-sm position-relative">
@@ -62,13 +42,15 @@ export default function PostCard({ post }) {
               >
                 <strong>{post.author_username}</strong>
               </Link>
-              <button
-                className="btn btn-sm btn-primary post-card__sub-btn"
-                onClick={handleToggle}
-              >
-                {subStatus === 'followed' ? 'Подписаны ✓' : 'Подписаться'}
-              </button>
+
+              {/* Вынесём логику подписки в отдельный компонент */}
+              <FollowButton
+                authorUsername={post.author_username}
+                isFollowed={isFollowed}
+                onChange={onToggleFollow}
+              />
             </div>
+
             <h5 className="card-title">{post.title}</h5>
             <p className="card-text flex-grow-1 text-truncate">
               {post.content.replace(/<[^>]+>/g, '').slice(0, 100)}…

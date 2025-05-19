@@ -6,7 +6,8 @@ import PostCard from '../../components/PostCard';
 import {
   fetchContentRecommendations,
   fetchCFRecommendations,
-  fetchHybridRecommendations
+  fetchHybridRecommendations,
+  fetchFollows
 } from '../../api';
 
 export default function RecommendationsPage() {
@@ -20,9 +21,19 @@ export default function RecommendationsPage() {
   const [mode, setMode]     = useState('hybrid');
   const [posts, setPosts]   = useState([]);
   const [loading, setLoading] = useState(true);
+  const [followedAuthors, setFollowedAuthors] = useState(new Set());
 
   // для гибрида пока жёстко
   const alpha = 0.6, n = 16;
+
+  useEffect(() => {
+    // один раз при монтировании страницы стягиваем подписки
+    fetchFollows()
+      .then(follows => {
+        setFollowedAuthors(new Set(follows.map(f => f.author_username)));
+      })
+      .catch(console.error);
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -68,7 +79,19 @@ export default function RecommendationsPage() {
           ) : posts.length > 0 ? (
             <div className="row g-4">
               {posts.map(post => (
-                <PostCard key={post.id} post={post} />
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  isFollowed={followedAuthors.has(post.author_username)}
+                  onToggleFollow={(newStatus, username) => {
+                    setFollowedAuthors(prev => {
+                      const next = new Set(prev);
+                      if (newStatus === 'followed') next.add(username);
+                      else next.delete(username);
+                      return next;
+                    });
+                  }}
+                />
               ))}
             </div>
           ) : (
