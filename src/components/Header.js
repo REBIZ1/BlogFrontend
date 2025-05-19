@@ -1,14 +1,22 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 export default function Header() {
   const navigate    = useNavigate();
+  const location = useLocation(); 
+
   const accessToken = localStorage.getItem('access');
   const username    = localStorage.getItem('username');
   const avatar      = localStorage.getItem('avatar');
-
+ 
   const [open, setOpen] = useState(false);
   const dropdownRef     = useRef(null);
+  const [query, setQuery] = useState('');
+
+  // Сбрасываем поле при любом изменении URL (path или ?search=…)
+  useEffect(() => {
+    setQuery('');
+  }, [location.pathname, location.search]);
 
   // закрываем при клике вне
   useEffect(() => {
@@ -26,17 +34,34 @@ export default function Header() {
     navigate('/');
   };
 
+  const handleSearch = () => {
+    const q = query.trim();
+    const params = q ? `?search=${encodeURIComponent(q)}` : '';
+    navigate(`/${params}`);
+  };
+
   return (
     <header className="site-header">
       {/* Лого */}
-      <Link to="/" className="site-logo">Дзен</Link>
+      <Link to="/" className="site-logo"></Link>
 
       {/* Поиск */}
       <div className="site-search">
-        <img src="/Header/Search.png" alt="Поиск" className="search-icon" />
+        <img
+          src="/Header/Search.png"
+          alt="Поиск"
+          className="search-icon"
+          style={{ cursor: 'pointer' }}
+          onClick={handleSearch}
+        />
         <input
           type="search"
-          placeholder="Поиск ..."
+          placeholder="Поиск …"
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          onKeyDown={e => {
+            if (e.key === 'Enter') handleSearch();
+          }}
         />
       </div>
 

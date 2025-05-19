@@ -11,12 +11,21 @@ export default function HomePage() {
   const location = useLocation(); // для чтения ?tag=…&tag=… из URL
 
   useEffect(() => {
-    const url = location.search
-      ? `http://localhost:8000/api/posts/${location.search}`
+    // разбираем ?search=…
+    const params = new URLSearchParams(location.search);
+    const search = params.get('search');
+
+    // формируем URL (DRF уже умеет ?search)
+    const apiUrl = search
+      ? `http://localhost:8000/api/posts/?search=${encodeURIComponent(search)}`
       : 'http://localhost:8000/api/posts/';
-    axios.get(url)
+
+    axios.get(apiUrl)
       .then(res => setPosts(res.data))
-      .catch(console.error);
+      .catch(err => {
+        console.error('Error fetching posts:', err);
+        setPosts([]);
+      });
   }, [location.search]);
 
   return (
