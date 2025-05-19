@@ -30,7 +30,7 @@ export default function PopularPage() {
         <main className="flex-grow-1 p-4">
           {/* Заголовок + селектор периода */}
           <div className="d-flex justify-content-between align-items-center mb-4">
-            <h1 className="m-0">Популярные посты</h1>
+          
             <select
               className="form-select form-select-sm w-auto"
               value={period}

@@ -29,7 +29,7 @@ export default function HomePage() {
 
         {/* Основной контент */}
         <main className="flex-grow-1 p-4">
-          <h1 className="mb-4">Список постов</h1>
+          
 
           {posts.length > 0
             ? <div className="row g-4">

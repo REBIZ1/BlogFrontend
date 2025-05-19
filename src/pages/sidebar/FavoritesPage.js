@@ -41,7 +41,7 @@ export default function FavoritesPage() {
         <Sidebar />
 
         <main className="flex-grow-1 p-4">
-          <h1 className="mb-4">Избранное</h1>
+          
 
           {loading ? (
             <p>Загрузка избранных постов...</p>

@@ -47,12 +47,12 @@ export default function Sidebar() {
 
   // Navigation items
   const navItems = [
-    { to: '/', label: 'Главная', icon: '🏠' },
-    { to: '/subscriptions', label: 'Подписки', icon: '🔔', badge: newSubsCount },
-    { to: '/popular', label: 'Популярное', icon: '🔥' },
-    { to: '/recommendations', label: 'Рекомендации', icon: '⭐' },
-    { to: '/new', label: 'Новые', icon: '🆕' },
-    { to: '/favorites', label: 'Избранное', icon: '❤️' },
+    { to: '/', label: 'Главная', iconSrc: '/SideBar/Home.png' },
+    { to: '/subscriptions', label: 'Подписки', iconSrc: '/SideBar/Subscriptions.png', badge: newSubsCount },
+    { to: '/popular', label: 'Популярное', iconSrc: '/SideBar/Popular.png' },
+    { to: '/recommendations', label: 'Рекомендации', iconSrc: '/SideBar/Recommendations.png' },
+    { to: '/new', label: 'Новые', iconSrc: '/SideBar/New.png' },
+    { to: '/favorites', label: 'Избранное', iconSrc: '/SideBar/Favorites.png' },
   ];
 
   // Range component renderers
@@ -213,7 +213,7 @@ export default function Sidebar() {
 
   return (
     <div
-      className="bg-white border-end"
+      className="custom-sidebar"  
       style={{ width: '240px', flex: '0 0 240px', height: 'calc(100vh - 68px)', overflowY: 'auto' }}
     >
       {/* Navigation */}
@@ -224,9 +224,9 @@ export default function Sidebar() {
             <li key={item.to}>
               <Link
                 to={item.to}
-                className={`d-flex align-items-center py-2 px-3 ${active ? 'bg-light fw-bold' : 'text-dark'}`}
+                className={`custom-sidebar-item d-flex align-items-center${active ? ' active' : ''}`}
               >
-                <span className="me-2">{item.icon}</span>
+                <img src={item.iconSrc} alt="" className="sidebar-icon" />
                 <span>{item.label}</span>
                 {item.badge > 0 && <span className="badge bg-danger ms-auto">{item.badge}</span>}
               </Link>
@@ -237,9 +237,9 @@ export default function Sidebar() {
 
       {/* Filters */}
       {pathname === '/' && (
-        <div className="p-3">
+        <div className="sidebar-filters">
           <button
-            className="btn btn-outline-secondary w-100 mb-2"
+            className="filter-btn"
             onClick={() => setShowFilters(v => !v)}
           >
             Поиск по фильтрам
@@ -249,15 +249,13 @@ export default function Sidebar() {
             <div ref={wrapperRef}>
               {/* Sorting buttons */}
               <button
-                type="button"
-                className="btn btn-outline-secondary w-100 mb-2"
+                className="filter-btn"
                 onClick={toggleLikesOrder}
               >
                 По лайкам {likesOrder === 'asc' ? '↑' : likesOrder === 'desc' ? '↓' : ''}
               </button>
               <button
-                type="button"
-                className="btn btn-outline-secondary w-100 mb-2"
+                className="filter-btn"
                 onClick={toggleViewsOrder}
               >
                 По просмотрам {viewsOrder === 'asc' ? '↑' : viewsOrder === 'desc' ? '↓' : ''}
@@ -370,13 +368,13 @@ export default function Sidebar() {
 
               {/* Action buttons */}
               <button
-                className="btn btn-secondary w-100 mt-2"
+                className="filter-btn clear-btn"
                 onClick={clearFilters}
               >
                 Очистить фильтры
               </button>
               <button
-                className="btn btn-primary w-100 mt-2"
+                className="filter-btn apply-btn"
                 onClick={applyFilters}
               >
                 Применить

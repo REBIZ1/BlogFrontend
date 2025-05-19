@@ -61,7 +61,7 @@ export default function RecommendationsPage() {
         <main className="flex-grow-1 p-4">
           {/* шапка + селектор режима */}
           <div className="d-flex justify-content-between align-items-center mb-4">
-            <h1 className="m-0">Рекомендации</h1>
+            
 
             <select
               className="form-select form-select-sm w-auto"

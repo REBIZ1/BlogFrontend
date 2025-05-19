@@ -275,3 +275,406 @@
   right: 0.5em;
   color: #006aff;
 }
+
+/* ================= Header ================= */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;  
+  height: 68px;  
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #fff;
+  /* убирать тень/границу */
+  box-shadow: none;
+  border-bottom: none;
+  /* отступы сверху и снизу */
+  padding: 12px 24px; /* по 12px сверху/снизу, 24px слева/справа */
+}
+
+.site-header .container-fluid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Лого */
+.site-header .site-logo {
+  display: block;
+  width: 140px;       /* подберите под своё лого */
+  height: 60px;
+  background: url('/public/logo.png') no-repeat left center / contain;
+  text-indent: -9999px;
+  margin-left: 16px;  /* небольшой отступ от края экрана */
+}
+
+/* --- Поиск --- */
+.site-search {
+  position: relative;
+  flex: 1;
+  max-width: 1100px;
+  margin: 0 24px;
+  height: 50px;
+}
+
+.site-search input {
+  width: 100%;
+  height: 100%;
+  padding: 0 16px 0 44px;
+  font-size: 15px;
+  color: #141414;
+  background: #F2F2F2;
+  border: none;
+  border-radius: 20px;   /* полностью круглые края */
+  outline: none;
+}
+
+.site-search .search-icon {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+
+/* === Кнопка Войти === */
+.btn-login {
+  /* Базовые свойства */
+  display: inline-block;
+  height: 32px;
+  padding: 0 16px;
+  background: #F2F2F5;
+  border: none;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #141414;
+
+  /* Выравниваем текст по центру по вертикали */
+  line-height: 32px;
+  text-align: center;
+
+  /* Убираем любые подчеркивания */
+  text-decoration: none;
+  outline: none;
+  box-shadow: none;
+
+  cursor: pointer;
+  transition: background .2s;
+}
+
+.btn-login:hover {
+  background: #E6E6EA;
+}
+.btn-login:focus {
+  outline: none;
+  box-shadow: none;
+  text-decoration: none;
+}
+
+/* контейнер кнопки + меню */
+.dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* сама кнопка */
+.btn-login {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 16px;
+  background: #F2F2F5;
+  border: none;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #141414;
+  cursor: pointer;
+  user-select: none;
+  transition: background .2s;
+}
+.btn-login:hover {
+  background: #E6E6EA;
+}
+.btn-login:focus {
+  outline: none;
+}
+
+/* выпадающее меню */
+.custom-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 8px 0;
+  min-width: 200px;
+  z-index: 1000;
+}
+
+/* разделитель между группами */
+.custom-dropdown-menu .divider {
+  height: 1px;
+  margin: 8px 0;
+  background-color: #e0e0e0;
+}
+
+/* пункт меню */
+.custom-dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  font-size: 14px;
+  color: #141414;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background-color .2s;
+  cursor: pointer;
+
+  /* обнуляем дефолтные button-стили, на случай если это <button> */
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  text-align: left;
+}
+
+/* hover равен для всех */
+.custom-dropdown-item:hover {
+  background-color: #F2F2F2;
+}
+
+/* дополнительный класс для «Выйти» */
+.custom-dropdown-item.logout {
+  color: #E53E3E;
+}
+
+/* зарезервированное место под иконку */
+.custom-dropdown-item .icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+}
+
+/* контейнер */
+.custom-sidebar {
+  padding-top: 16px;
+  background: #fff;
+  /* убираем рамку */
+  border-right: none !important;
+  /* тонкая внутренняя тень слева */
+  box-shadow: none !important;
+
+  /* делаем «липким» */
+  position: sticky;
+  top: 0;       /* отступ от верхней границы окна */
+  align-self: flex-start;
+  top: 68px;  
+}
+
+/* сам пункт меню */
+.custom-sidebar-item {
+  padding: 8px 16px;
+  margin: 4px 8px;            /* отступы вокруг */
+  border-radius: 8px;
+  color: #141414;
+  text-decoration: none;
+  transition: background .2s, color .2s;
+}
+
+/* зарезервировать место под иконку */
+.custom-sidebar-item .me-2 {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;         /* уже есть, но убедись */
+}
+
+/* hover-эффект */
+.custom-sidebar-item:hover {
+  background: #F2F2F2;
+}
+
+/* активный пункт */
+.custom-sidebar-item.active {
+  background: #E6E6EA;
+  font-weight: 600;
+}
+
+.sidebar-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+  object-fit: contain;
+}
+
+/* === Сайдбар без правого бордера === */
+.custom-sidebar {
+  /* убираем стандартный border-end/bootstrap */
+  border-right: none !important;
+}
+
+/* ========== Sidebar ========== */
+/* Убираем правый контур */
+.custom-sidebar {
+  background: #FFFFFF;
+  border-right: none !important;
+  box-shadow: inset -1px 0 0 rgba(0,0,0,0.05);
+}
+
+/* ========== Filters Container ========== */
+.sidebar-filters {
+  padding: 16px;
+}
+
+/* ========== Filter Buttons ========== */
+.sidebar-filters .filter-btn {
+  display: block;
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #141414;
+  background: #FFFFFF;
+  border: 1px solid #D1D5DB;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background .2s, border-color .2s;
+  text-align: center;
+}
+
+.sidebar-filters .filter-btn:hover {
+  background: #F3F4F6;
+  border-color: #C4C7CC;
+}
+
+.sidebar-filters .filter-btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Очистить фильтры */
+.sidebar-filters .filter-btn.clear-btn {
+  background: #6B7280;
+  border-color: #6B7280;
+  color: #FFFFFF;
+}
+
+.sidebar-filters .filter-btn.clear-btn:hover {
+  background: #4B5563;
+  border-color: #4B5563;
+}
+
+/* Применить */
+.sidebar-filters .filter-btn.apply-btn {
+  background: #2563EB;
+  border-color: #2563EB;
+  color: #FFFFFF;
+}
+
+.sidebar-filters .filter-btn.apply-btn:hover {
+  background: #1E40AF;
+  border-color: #1E40AF;
+}
+
+
+/* ========== React-Range Slider ========== */
+.sidebar-filters .range-track {
+  height: 6px !important;
+  background: #E5E7EB !important;
+  border-radius: 3px !important;
+}
+
+.sidebar-filters .range-thumb {
+  width: 16px !important;
+  height: 16px !important;
+  background: #2563EB !important;
+  border-radius: 50% !important;
+  box-shadow: none !important;
+}
+
+
+/* ========== Date Inputs ========== */
+.sidebar-filters input[type="date"] {
+  width: 100%;
+  max-width: 100px;
+  margin-right: 8px;
+  padding: 6px 8px;
+  font-size: 14px;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  background: #FFFFFF;
+  box-shadow: none;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.sidebar-filters input[type="date"]::-webkit-inner-spin-button,
+.sidebar-filters input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+
+/* ========== Text Inputs (Автор, Теги) ========== */
+.sidebar-filters .form-control {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 14px;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  box-shadow: none;
+  outline: none;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+}
+
+/* Подсказки при вводе (списки под полями) */
+.sidebar-filters .list-group.position-absolute {
+  width: 100%;
+  max-width: 200px;
+  margin-top: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  background: #FFFFFF;
+  z-index: 1000;
+}
+
+.sidebar-filters .list-group-item {
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background .2s;
+}
+
+.sidebar-filters .list-group-item:hover {
+  background: #F3F4F6;
+}
+
+
+/* ========== Labels ========== */
+.sidebar-filters label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: #141414;
+}
+
+/* Сетка для даты */
+.sidebar-filters .date-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* Отступ между секциями */
+.sidebar-filters > * + * {
+  margin-top: 16px;
+}

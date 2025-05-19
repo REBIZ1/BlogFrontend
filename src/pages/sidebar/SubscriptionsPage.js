@@ -21,7 +21,7 @@ export default function SubscriptionsPage() {
       <div className="d-flex">
         <Sidebar />
         <main className="flex-grow-1 p-4">
-          <h1 className="mb-4">Подписки</h1>
+          
           {loading ? (
             <p>Загрузка…</p>
           ) : posts.length > 0 ? (

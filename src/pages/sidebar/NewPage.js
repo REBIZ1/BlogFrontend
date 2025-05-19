@@ -25,7 +25,7 @@ export default function NewPage() {
         <Sidebar />
 
         <main className="flex-grow-1 p-4">
-          <h1 className="mb-4">Новые посты</h1>
+   
 
           {loading ? (
             <p>Загрузка...</p>

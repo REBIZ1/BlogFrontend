@@ -1,9 +1,8 @@
-// src/components/Header.js
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 export default function Header() {
-  const navigate = useNavigate();
+  const navigate    = useNavigate();
   const accessToken = localStorage.getItem('access');
   const username    = localStorage.getItem('username');
   const avatar      = localStorage.getItem('avatar');
@@ -11,15 +10,7 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const dropdownRef     = useRef(null);
 
-  const handleLogout = () => {
-    localStorage.removeItem('access');
-    localStorage.removeItem('refresh');
-    localStorage.removeItem('username');
-    localStorage.removeItem('avatar');
-    navigate('/login');
-  };
-
-  // Закрываем дропдаун при клике вне его
+  // закрываем при клике вне
   useEffect(() => {
     const onClickOutside = e => {
       if (open && dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -30,56 +21,86 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', onClickOutside);
   }, [open]);
 
+  const handleLogout = () => {
+    ['access','refresh','username','avatar'].forEach(k => localStorage.removeItem(k));
+    navigate('/');
+  };
+
   return (
-    <header className="bg-white shadow-sm mb-4">
-      <div className="container d-flex justify-content-between align-items-center py-3">
-        <Link to="/" className="text-decoration-none text-dark">
-          <h2 className="mb-0">📚 BlogGibrid</h2>
-        </Link>
+    <header className="site-header">
+      {/* Лого */}
+      <Link to="/" className="site-logo">Дзен</Link>
 
-        {accessToken ? (
-          <div className="position-relative" ref={dropdownRef}>
+      {/* Поиск */}
+      <div className="site-search">
+        <img src="/Header/Search.png" alt="Поиск" className="search-icon" />
+        <input
+          type="search"
+          placeholder="Поиск ..."
+        />
+      </div>
+
+      {/* Кнопка Войти / профиль */}
+    {accessToken ? (
+      <div className="dropdown-wrapper" ref={dropdownRef}>
+        <button
+          className="btn-login"
+          onClick={() => setOpen(o => !o)}
+        >
+          {avatar && (
+            <img
+              src={avatar}
+              alt="Аватар"
+              style={{
+                width: '24px',
+                height: '24px',
+                borderRadius: '50%',
+                objectFit: 'cover',
+                marginRight: '8px'
+              }}
+            />
+          )}
+          <span>{username}</span>
+          <span style={{ marginLeft: '6px' }}>&#x25BE;</span>
+        </button>
+
+        {open && (
+          <div className="custom-dropdown-menu">
+            <Link to="/account/create" className="custom-dropdown-item">
+              <img src="/Header/Create.png" className="icon" />
+              Написать статью
+            </Link>
+            <Link to="/account/favorites" className="custom-dropdown-item">
+              <img src="/SideBar/Favorites.png" className="icon" />
+              Избранное
+            </Link>
+            <Link to="/account/history" className="custom-dropdown-item">
+              <img src="/Header/History.png" className="icon" />
+              История
+            </Link>
+            <Link to="/account/settings" className="custom-dropdown-item">
+              <img src="/Header/Setting.png" className="icon" />
+              Настройки
+            </Link>
+
+
+            <div className="divider" />
+
             <button
-              className="btn btn-light d-flex align-items-center"
-              onClick={() => setOpen(o => !o)}
+              onClick={handleLogout}
+              className="custom-dropdown-item logout"
             >
-              {avatar && (
-                <img
-                  src={avatar}
-                  alt="Аватар"
-                  style={{
-                    width: "32px",
-                    height: "32px",
-                    borderRadius: "50%",
-                    objectFit: "cover",
-                    marginRight: "8px"
-                  }}
-                />
-              )}
-              <span>{username}</span>
-              <span className="ms-2">&#x25BE;</span> {/* стрелочка вниз */}
+              <img src="/Header/Exit.png" className="icon" /> 
+              Выйти
             </button>
-
-            <div
-              className={`dropdown-menu dropdown-menu-end${open ? ' show' : ''}`}
-              style={{ minWidth: '200px' }}
-            >
-                <Link to="/account/create"    className="dropdown-item">📝 Написать статью</Link>
-                <Link to="/account/favorites" className="dropdown-item">⭐ Избранное</Link>
-                <Link to="/account/history"   className="dropdown-item">📜 История просмотра</Link>
-                <Link to="/account/settings"  className="dropdown-item">⚙️ Настройки аккаунта</Link>
-              <div className="dropdown-divider"></div>
-              <button onClick={handleLogout} className="dropdown-item text-danger">
-                🚪 Выйти
-              </button>
-            </div>
           </div>
-        ) : (
-          <Link to="/login" className="btn btn-outline-primary btn-sm">
-            Войти
-          </Link>
         )}
       </div>
+    ) : (
+      <button onClick={() => navigate('/login')} className="btn-login">
+        Войти
+      </button>
+    )}
     </header>
   );
 }
