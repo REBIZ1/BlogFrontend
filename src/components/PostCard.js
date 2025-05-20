@@ -28,13 +28,13 @@ export default function PostCard({
           <div className="card-body d-flex flex-column flex-grow-1">
             <div className="d-flex align-items-center mb-2 position-relative">
               {post.author_avatar && (
-                <Link to={`/author/${post.author_username}`}>
+                //<Link to={`/author/${post.author_username}`}>
                   <img
                     src={post.author_avatar}
                     alt={post.author_username}
                     className="rounded-circle post-card__avatar"
                   />
-                </Link>
+                //</Link>
               )}
               <Link
                 to={`/author/${post.author_username}`}

@@ -150,7 +150,7 @@ export default function PostDetailPage() {
             </div>
 
             {/* Заголовок */}
-            <h1 className="mb-4">{post.title}</h1>
+            <h1 className="mb-4 post-title">{post.title}</h1>
 
             {/* Содержимое */}
             <div
@@ -161,13 +161,13 @@ export default function PostDetailPage() {
             {/* Теги */}
             <div className="mb-4">
               {post.tags.map(tag => (
-                <Link
-                  key={tag.slug}
-                  to={`/?tag=${tag.slug}`}
-                  className="badge bg-secondary me-1"
-                >
-                  #{tag.name}
-                </Link>
+              <Link
+                key={tag.slug}
+                to={`/?tag=${tag.slug}`}
+                className="tag-badge"
+              >
+                #{tag.name}
+              </Link>
               ))}
             </div>
 
@@ -177,7 +177,7 @@ export default function PostDetailPage() {
                 className={`btn ${isLiked ? 'btn-danger' : 'btn-outline-danger'}`}
                 onClick={toggleLike}
               >
-                {isLiked ? '💔 Убрать лайк' : '❤️ Лайкнуть'} {likesCount}
+                {isLiked ? ' ❤️ ' : ' ❤️ '} {likesCount}
               </button>
               <p className="text-muted mb-0">👁 Просмотров: {post.views}</p>
             </div>

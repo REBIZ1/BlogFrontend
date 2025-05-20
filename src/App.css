@@ -228,6 +228,10 @@
   margin-top: 0.25rem;
 }
 
+.article-content {
+  word-break: break-word;      /* или break-all / overflow-wrap: anywhere */
+}
+
 .article-content img {
   max-width: 100%;
   height: auto;
@@ -677,4 +681,27 @@
 /* Отступ между секциями */
 .sidebar-filters > * + * {
   margin-top: 16px;
+}
+
+.post-title {
+  word-break: break-word;
+  /* overflow-wrap: anywhere; */
+}
+
+.tag-badge {
+  display: inline-block;
+  padding: 0.15em 0.5em;
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #555;                      /* спокойный серый текст */
+  background-color: #f0f0f0;        /* светло-серый фон */
+  border: 1px solid #ddd;           /* тонкая светлая обводка */
+  border-radius: 0.25rem;           /* небольшое скругление */
+  text-decoration: none;
+  margin-right: 0.25rem;
+  transition: background-color 0.2s;
+}
+
+.tag-badge:hover {
+  background-color: #e0e0e0;        /* чуть темнее на ховер */
 }

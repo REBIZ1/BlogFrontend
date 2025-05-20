@@ -38,6 +38,7 @@ export default function CreatePostPage() {
   });
   // errors хранит объект полевых ошибок { title: [...], content: [...], tag_slugs: [...], non_field_errors: [...] }
   const [errors, setErrors] = useState({});
+  const [successMessage, setSuccessMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (e) => {
@@ -58,6 +59,7 @@ export default function CreatePostPage() {
     e.preventDefault();
     setSubmitting(true);
     setErrors({});
+    setSuccessMessage('');
 
     const refresh = localStorage.getItem('refresh');
     let access = localStorage.getItem('access');
@@ -82,21 +84,26 @@ export default function CreatePostPage() {
     formData.tag_slugs.forEach(slug => data.append('tag_slugs', slug));
     
     try {
-      await axios.post(
+      const resp = await axios.post(
         'http://localhost:8000/api/posts/',
         data,
         { headers: { Authorization: `Bearer ${access}` } }
       );
-      navigate('/account/create');  // или на detail созданного поста
+
+      // Показываем сообщение об успехе
+      setSuccessMessage('Статья успешно создана!');
+      // Через 1.5 секунды перебрасываем пользователя, например, на список или detail
+      setTimeout(() => {
+        navigate('/account/create', { replace: true });
+      }, 1500);
+
     } catch (err) {
       const resp = err.response?.data;
       if (resp) {
-        // преобразуем tag_slugs в совпадающий ключ
         const fieldErrors = {};
-        for (const key of Object.keys(resp)) {
-          // если бэкенд отдал tag_slugs, поправим на tagSlugs
-          const field = key === 'tag_slugs' ? 'tagSlugs' : key;
-          fieldErrors[key] = resp[key];
+        // Ключи приходят точно такими, как в DRF: title, content, tag_slugs…
+        for (const [key, messages] of Object.entries(resp)) {
+          fieldErrors[key] = messages;
         }
         setErrors(fieldErrors);
       } else {
@@ -139,6 +146,7 @@ export default function CreatePostPage() {
           <input
             type="file"
             name="cover"
+            required
             className={`form-control ${errors.cover ? 'is-invalid' : ''}`}
             onChange={handleChange}
           />
@@ -184,6 +192,12 @@ export default function CreatePostPage() {
             <div key={i} className="text-danger mt-1">{msg}</div>
           ))}
         </div>
+        
+      {successMessage && (
+        <div className="alert alert-success">
+          {successMessage}
+        </div>
+      )}
 
         <button
           type="submit"

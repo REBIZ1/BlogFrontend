@@ -11,15 +11,11 @@ export default function HomePage() {
   const location = useLocation(); // для чтения ?tag=…&tag=… из URL
 
   useEffect(() => {
-    // разбираем ?search=…
-    const params = new URLSearchParams(location.search);
-    const search = params.get('search');
-
-    // формируем URL (DRF уже умеет ?search)
-    const apiUrl = search
-      ? `http://localhost:8000/api/posts/?search=${encodeURIComponent(search)}`
+    // передаём всю строку параметров, а не только search
+    const apiUrl = location.search
+      ? `http://localhost:8000/api/posts/${location.search}`
       : 'http://localhost:8000/api/posts/';
-
+    
     axios.get(apiUrl)
       .then(res => setPosts(res.data))
       .catch(err => {
@@ -28,6 +24,7 @@ export default function HomePage() {
       });
   }, [location.search]);
 
+  
   return (
     <>
       <Header />
