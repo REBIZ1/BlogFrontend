@@ -8,9 +8,11 @@ import PostCard from '../components/PostCard';
 
 export default function HomePage() {
   const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const location = useLocation(); // для чтения ?tag=…&tag=… из URL
 
   useEffect(() => {
+    setLoading(true);
     // передаём всю строку параметров, а не только search
     const apiUrl = location.search
       ? `http://localhost:8000/api/posts/${location.search}`
@@ -21,7 +23,8 @@ export default function HomePage() {
       .catch(err => {
         console.error('Error fetching posts:', err);
         setPosts([]);
-      });
+      })
+      .finally(() => setLoading(false));
   }, [location.search]);
 
   
@@ -36,15 +39,22 @@ export default function HomePage() {
         {/* Основной контент */}
         <main className="flex-grow-1 p-4">
           
-
-          {posts.length > 0
-            ? <div className="row g-4">
-                {posts.map(post => (
-                  <PostCard key={post.id} post={post} />
-                ))}
-              </div>
-            : <p>Постов пока нет.</p>
-          }
+          {loading ? (
+            // Пока грузятся — показываем, скажем, 8 скелетонов
+            <div className="row g-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <PostCard key={`skeleton-${i}`} isLoading />
+              ))}
+            </div>
+          ) : posts.length > 0 ? (
+            <div className="row g-4">
+              {posts.map(post => (
+                <PostCard key={post.id} post={post} />
+              ))}
+            </div>
+          ) : (
+            <p>Постов пока нет.</p>
+          )}
         </main>
       </div>
     </>

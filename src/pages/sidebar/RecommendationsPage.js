@@ -73,12 +73,14 @@ export default function RecommendationsPage() {
               ))}
             </select>
           </div>
-
-          {loading ? (
-            <p>Загрузка…</p>
-          ) : posts.length > 0 ? (
-            <div className="row g-4">
-              {posts.map(post => (
+          <div className="row g-4">
+            {loading ? (
+              // пока грузим — показываем 8 скелетонов
+              Array.from({ length: 8 }).map((_, i) => (
+                <PostCard key={`skeleton-${i}`} isLoading />
+              ))
+            ) : posts.length > 0 ? (
+              posts.map(post => (
                 <PostCard
                   key={post.id}
                   post={post}
@@ -92,11 +94,11 @@ export default function RecommendationsPage() {
                     });
                   }}
                 />
-              ))}
-            </div>
-          ) : (
-            <p>Пока нет рекомендаций.</p>
-          )}
+              ))
+            ) : (
+              <p>Пока нет рекомендаций.</p>
+            )}
+          </div>
         </main>
       </div>
     </>

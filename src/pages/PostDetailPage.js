@@ -5,7 +5,8 @@ import axios from 'axios';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import CommentsList from '../components/CommentsList';
-import { toggleFollow, fetchFollows } from '../api';
+import PostCard from '../components/PostCard';
+import { toggleFollow, fetchFollows, fetchHybridRecommendations } from '../api';
 
 export default function PostDetailPage() {
   const { id } = useParams();
@@ -16,7 +17,9 @@ export default function PostDetailPage() {
   const [likesCount, setLikesCount] = useState(0);
   const [isLiked, setIsLiked]       = useState(false);
   const [message, setMessage]       = useState('');
-
+  const [recs, setRecs]     = useState([]);
+  const [recsLoading, setRecsLoading] = useState(true);
+  
   useEffect(() => {
     axios.get(`http://localhost:8000/api/posts/${id}/`)
       .then(res => {
@@ -57,6 +60,21 @@ export default function PostDetailPage() {
         setSubStatus(isFollow ? 'followed' : 'unfollowed');
       })
       .catch(console.error);
+
+    setRecsLoading(true);
+    // например, гибридные рекомендации, можно передать n=3
+    const desired = 3;
+    // запрашиваем на 1 больше
+    fetchHybridRecommendations(0.6, desired + 1)
+      .then(data => {
+        // фильтруем текущую статью и обрезаем до нужного размера
+        const filtered = data
+          .filter(p => p.id !== post.id)
+          .slice(0, desired);
+        setRecs(filtered);
+    })
+      .catch(console.error)
+      .finally(() => setRecsLoading(false));
   }, [post]);
 
   const toggleLike = () => {
@@ -94,15 +112,7 @@ export default function PostDetailPage() {
 
         {/* Основной контент: центрируем и ограничиваем ширину */}
         <main className="flex-grow-1 p-4">
-          <div
-            style={{
-              position: 'absolute',
-              left: '50vw',
-              transform: 'translateX(-50%)',
-              width: '100%',
-              maxWidth: 800
-            }}
-          >
+          <div className="post-content-wrapper">
             {/* Обложка: object-position top */}
             {post.cover && (
               <div style={{ overflow: 'hidden', borderRadius: 8, marginBottom: 20 }}>
@@ -200,6 +210,25 @@ export default function PostDetailPage() {
               </div>
             )}
             <CommentsList postId={post.id} />
+
+            <section className="mt-5 recommendations">
+              <h2>Рекомендуем почитать</h2>
+              {recsLoading ? (
+                <p>Загрузка рекомендаций…</p>
+              ) : recs.length > 0 ? (
+                <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+                  {recs.map(p => (
+                    // Здесь уже сами контролируем колонку, а карточке говорим noWrapper
+                    <div className="col" key={p.id}>
+                      <PostCard post={p} noWrapper />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p>Пока нет рекомендаций.</p>
+              )}
+            </section>
+
           </div>
         </main>
       </div>

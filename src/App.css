@@ -162,7 +162,6 @@
   padding-left: 0; /* отступ создаётся через border */
 }
 
-
 /* Блок шапки: аватар + имя + время */
 .comment-header {
   display: flex;
@@ -704,4 +703,27 @@
 
 .tag-badge:hover {
   background-color: #e0e0e0;        /* чуть темнее на ховер */
+}
+
+.post-content-wrapper {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 800px;
+}
+
+.recommendations .card {
+  width: 100% !important;
+  max-width: none   !important;
+}
+
+.skeleton {
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  animation: skeleton-loading 1.2s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+  0%   { background-color: #e0e0e0; }
+  50%  { background-color: #f0f0f0; }
+  100% { background-color: #e0e0e0; }
 }
